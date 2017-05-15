@@ -1,5 +1,7 @@
 package bacnet
 
+import "fmt"
+
 /* from clause 20.2.1.2 Tag Number */
 /* true if extended tag numbering is used */
 func IS_EXTENDED_TAG_NUMBER(x byte) bool {
@@ -10,6 +12,13 @@ func IS_EXTENDED_TAG_NUMBER(x byte) bool {
 /* true if the extended value is used */
 func IS_EXTENDED_VALUE(x byte) bool {
 	return (x & 0x07) == 5
+}
+
+/* from clause 20.2.1.1 Class */
+/* true if the tag is context specific */
+func IS_CONTEXT_SPECIFIC(x byte) bool {
+	fmt.Printf("%d %d %d   is context specific: %t\n", x, x & BIT3, BIT3, (x & BIT3) == BIT3)
+	return (x & BIT3) == BIT3
 }
 
 /* from clause 20.2.1.3.2 Constructed Data */
@@ -156,7 +165,7 @@ func decode_tag_number(apdu []byte) (int, byte) {
 		tag_number = apdu[1]
 		length++
 	} else {
-		tag_number = uint8(apdu[0] >> 4)
+		tag_number = apdu[0] >> 4
 	}
 
 	return length, tag_number
@@ -183,7 +192,7 @@ func decode_tag_number_and_value(apdu []byte) (int, byte, uint32) {
 		} else if (apdu[length] == 254) {
 			length++
 			len_tmp, value16 = decode_unsigned16(apdu[length:])
-			length += len_tmp
+			length += len_tmpxo
 			value = uint32(value16)
 		} else {
 			value = uint32(apdu[length])
@@ -200,6 +209,14 @@ func decode_tag_number_and_value(apdu []byte) (int, byte, uint32) {
 	}
 
 	return length, tag_number, value
+}
+
+/* from clause 20.2.1.3.2 Constructed Data */
+/* returns true if the tag is context specific and matches */
+func decode_is_context_tag(apdu []byte, tag_number byte) bool {
+	_, my_tag_number := decode_tag_number(apdu)
+	fmt.Printf("need %d, found %d\n", tag_number, my_tag_number)
+	return IS_CONTEXT_SPECIFIC(apdu[0]) && tag_number == my_tag_number
 }
 
 /* from clause 20.2.14 Encoding of an Object Identifier Value */
@@ -303,18 +320,34 @@ func encode_application_character_string(apdu []byte, char_string *BACNET_CHARAC
 }
 
 func encode_context_character_string(apdu []byte, tag_number byte, char_string *BACNET_CHARACTER_STRING) int {
-	var len int = 0
+	var len_tmp int = 0
 	var string_len int = 0
 
 	string_len = int(characterstring_length(char_string)) + 1 /* for encoding */
-	len += encode_tag(apdu, tag_number, true, uint32(string_len))
-	if len + string_len < MAX_APDU {
-		len += encode_bacnet_character_string(apdu[len:], char_string)
+	len_tmp += encode_tag(apdu, tag_number, true, uint32(string_len))
+	if len_tmp + string_len < MAX_APDU {
+		len_tmp += encode_bacnet_character_string(apdu[len_tmp:], char_string)
 	} else {
-		len = 0
+		len_tmp = 0
 	}
 
-	return len
+	return len_tmp
+}
+
+/* from clause 20.2.9 Encoding of a Character String Value */
+/* and 20.2.1 General Rules for Encoding BACnet Tags */
+/* returns the number of apdu bytes consumed */
+func decode_character_string(apdu []byte, len_value uint32) (int, BACNET_CHARACTER_STRING) {
+	var len_tmp int = 0
+	var status bool = false
+	var char_string BACNET_CHARACTER_STRING
+
+	status = characterstring_init(&char_string, apdu[0], apdu[1:], len_value - 1)
+	if status {
+		len_tmp = int(len_value)
+	}
+
+	return len_tmp, char_string
 }
 
 /* from clause 20.2.4 Encoding of an Unsigned Integer Value */
