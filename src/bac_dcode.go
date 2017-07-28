@@ -17,7 +17,7 @@ func IS_EXTENDED_VALUE(x byte) bool {
 /* from clause 20.2.1.1 Class */
 /* true if the tag is context specific */
 func IS_CONTEXT_SPECIFIC(x byte) bool {
-	fmt.Printf("%d %d %d   is context specific: %t\n", x, x & BIT3, BIT3, (x & BIT3) == BIT3)
+	fmt.Printf("%d %d %d   is context specific: %t\n", x, x&BIT3, BIT3, (x&BIT3) == BIT3)
 	return (x & BIT3) == BIT3
 }
 
@@ -77,7 +77,7 @@ func encode_max_segs_max_apdu(max_segs int, max_apdu uint32) byte {
 /* from clause 20.2.1 General Rules for Encoding BACnet Tags */
 /* returns the number of apdu bytes consumed */
 func encode_tag(apdu []byte, tag_number byte, context_specific bool, len_value_type uint32) int {
-	var length int = 1        /* return value */
+	var length int = 1 /* return value */
 
 	apdu[0] = 0
 	if context_specific {
@@ -96,14 +96,14 @@ func encode_tag(apdu []byte, tag_number byte, context_specific bool, len_value_t
 
 	/* NOTE: additional len byte(s) after extended tag byte */
 	/* if larger than 4 */
-	if (len_value_type <= 4) {
+	if len_value_type <= 4 {
 		apdu[0] |= byte(len_value_type)
 	} else {
 		apdu[0] |= 5
 		length++
-		if (len_value_type <= 253) {
+		if len_value_type <= 253 {
 			apdu[length] = byte(len_value_type)
-		} else if (len_value_type <= 65535) {
+		} else if len_value_type <= 65535 {
 			apdu[length] = 254
 			length += encode_unsigned16(apdu[length:], uint16(len_value_type))
 		} else {
@@ -189,10 +189,10 @@ func decode_tag_number_and_value(apdu []byte) (int, byte, uint32) {
 			len_tmp, value32 = decode_unsigned32(apdu[length:])
 			length += len_tmp
 			value = value32
-		} else if (apdu[length] == 254) {
+		} else if apdu[length] == 254 {
 			length++
 			len_tmp, value16 = decode_unsigned16(apdu[length:])
-			length += len_tmpxo
+			length += len_tmp
 			value = uint32(value16)
 		} else {
 			value = uint32(apdu[length])
@@ -285,7 +285,7 @@ func encode_bacnet_character_string_safe(apdu []byte, max_apdu uint32, encoding 
 	if apdu_len <= max_apdu {
 		apdu[0] = encoding
 		for i = 0; i < length; i++ {
-			apdu[1 + i] = pString[i]
+			apdu[1+i] = pString[i]
 		}
 	} else {
 		apdu_len = 0
@@ -310,7 +310,7 @@ func encode_application_character_string(apdu []byte, char_string *BACNET_CHARAC
 
 	len_str = int(characterstring_length(char_string)) + 1 /* for encoding */
 	length = encode_tag(apdu, BACNET_APPLICATION_TAG_CHARACTER_STRING, false, uint32(len_str))
-	if length + len_str < MAX_APDU {
+	if length+len_str < MAX_APDU {
 		length += encode_bacnet_character_string(apdu[length:], char_string)
 	} else {
 		length = 0
@@ -325,7 +325,7 @@ func encode_context_character_string(apdu []byte, tag_number byte, char_string *
 
 	string_len = int(characterstring_length(char_string)) + 1 /* for encoding */
 	len_tmp += encode_tag(apdu, tag_number, true, uint32(string_len))
-	if len_tmp + string_len < MAX_APDU {
+	if len_tmp+string_len < MAX_APDU {
 		len_tmp += encode_bacnet_character_string(apdu[len_tmp:], char_string)
 	} else {
 		len_tmp = 0
@@ -342,7 +342,7 @@ func decode_character_string(apdu []byte, len_value uint32) (int, BACNET_CHARACT
 	var status bool = false
 	var char_string BACNET_CHARACTER_STRING
 
-	status = characterstring_init(&char_string, apdu[0], apdu[1:], len_value - 1)
+	status = characterstring_init(&char_string, apdu[0], apdu[1:], len_value-1)
 	if status {
 		len_tmp = int(len_value)
 	}
@@ -356,7 +356,7 @@ func decode_character_string(apdu []byte, len_value uint32) (int, BACNET_CHARACT
 func decode_unsigned(apdu []byte, len_value uint32) (int, uint32) {
 	var unsigned16_value uint16 = 0
 	var value uint32 = 0
-	switch (len_value) {
+	switch len_value {
 	case 1:
 		value = uint32(apdu[0])
 	case 2:
@@ -376,13 +376,13 @@ func decode_unsigned(apdu []byte, len_value uint32) (int, uint32) {
 /* and 20.2.1 General Rules for Encoding BACnet Tags */
 /* returns the number of apdu bytes consumed */
 func encode_bacnet_unsigned(apdu []byte, value uint32) int {
-	var len int = 0        /* return value */
-	if (value < 0x100) {
+	var len int = 0 /* return value */
+	if value < 0x100 {
 		apdu[0] = byte(value)
 		len = 1
-	} else if (value < 0x10000) {
+	} else if value < 0x10000 {
 		len = encode_unsigned16(apdu, uint16(value))
-	} else if (value < 0x1000000) {
+	} else if value < 0x1000000 {
 		len = encode_unsigned24(apdu, value)
 	} else {
 		len = encode_unsigned32(apdu, value)
@@ -397,11 +397,11 @@ func encode_context_unsigned(apdu []byte, tag_number uint8, value uint32) int {
 	var length int = 0
 
 	/* length of unsigned is variable, as per 20.2.4 */
-	if (value < 0x100) {
+	if value < 0x100 {
 		length = 1
-	} else if (value < 0x10000) {
+	} else if value < 0x10000 {
 		length = 2
-	} else if (value < 0x1000000) {
+	} else if value < 0x1000000 {
 		length = 3
 	} else {
 		length = 4
@@ -448,7 +448,7 @@ func encode_bacnet_enumerated(apdu []byte, value uint32) int {
 /* and 20.2.1 General Rules for Encoding BACnet Tags */
 /* returns the number of apdu bytes consumed */
 func encode_application_enumerated(apdu []byte, value uint32) int {
-	var length int = 0        /* return value */
+	var length int = 0 /* return value */
 
 	/* assumes that the tag only consumes 1 octet */
 	length = encode_bacnet_enumerated(apdu[1:], value)
@@ -511,7 +511,6 @@ func encode_context_time(apdu []byte, tag_number byte, btime *BACNET_TIME) int {
 	return length
 }
 
-
 /* BACnet Date */
 /* year = years since 1900 */
 /* month 1=Jan */
@@ -523,9 +522,9 @@ func encode_context_time(apdu []byte, tag_number byte, btime *BACNET_TIME) int {
 /* returns the number of apdu bytes consumed */
 func encode_bacnet_date(apdu []byte, bdate *BACNET_DATE) int {
 	/* allow 2 digit years */
-	if (bdate.Year >= 1900) {
+	if bdate.Year >= 1900 {
 		apdu[0] = byte(bdate.Year - 1900)
-	} else if (bdate.Year < 0x100) {
+	} else if bdate.Year < 0x100 {
 		apdu[0] = byte(bdate.Year)
 	} else {
 		/*
