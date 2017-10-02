@@ -192,7 +192,7 @@ func decode_tag_number_and_value(apdu []byte) (int, byte, uint32) {
 		} else if (apdu[length] == 254) {
 			length++
 			len_tmp, value16 = decode_unsigned16(apdu[length:])
-			length += len_tmpxo
+			length += len_tmp
 			value = uint32(value16)
 		} else {
 			value = uint32(apdu[length])
