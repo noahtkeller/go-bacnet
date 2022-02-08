@@ -1,6 +1,6 @@
 # Golang BACNet Library
 
-[![Coverage Status](https://coveralls.io/repos/github/noahtkeller/node-common-backend/badge.svg?branch=master)](https://coveralls.io/github/noahtkeller/node-common-backend?branch=master)[![Coverage Status](https://coveralls.io/repos/github/noahtkeller/node-common-backend/badge.svg?branch=master)](https://coveralls.io/github/noahtkeller/node-common-backend?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/noahtkeller/node-common-backend/badge.svg?branch=master)](https://coveralls.io/github/noahtkeller/node-common-backend?branch=master)
 [![CircleCI](https://circleci.com/gh/noahtkeller/go-bacnet/tree/develop.svg?style=shield)](https://circleci.com/gh/noahtkeller/go-bacnet/tree/develop)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfc4d0c7ef82442eaa6d2c3d18bfb3a7)](https://app.codacy.com/gh/noahtkeller/go-bacnet?utm_source=github.com&utm_medium=referral&utm_content=noahtkeller/go-bacnet&utm_campaign=Badge_Grade_Settings)
 [![Join the chat at https://gitter.im/noahtkeller/go-bacnet](https://badges.gitter.im/noahtkeller/go-bacnet.svg)](https://gitter.im/noahtkeller/go-bacnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
