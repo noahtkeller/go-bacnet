@@ -1,5 +1,7 @@
 # Golang BACNet Library
 
+[![Join the chat at https://gitter.im/noahtkeller/go-bacnet](https://badges.gitter.im/noahtkeller/go-bacnet.svg)](https://gitter.im/noahtkeller/go-bacnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is influenced heavily by Steve Karg's bacnet-stack library.
 Everything that's here should work, except for the svc_ack_alarm stuff.
 Having trouble encoding the strings here. Also had some troubles decoding
