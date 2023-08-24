@@ -20,7 +20,7 @@ func TestNPDUEncodingAndDecoding(t *testing.T) {
 	} else if encodedService.ProtocolVersion != decodedService.ProtocolVersion {
 		t.Errorf("ProtocolVersion mismatch: %d %d", encodedService.ProtocolVersion, decodedService.ProtocolVersion)
 	} else if encodedService.NetworkLayer != decodedService.NetworkLayer {
-		t.Errorf("NetworkLayer mismatch: %d %d", encodedService.NetworkLayer, decodedService.NetworkLayer)
+		t.Errorf("NetworkLayer mismatch: %v %v", encodedService.NetworkLayer, decodedService.NetworkLayer)
 	} else if encodedService.HopCount != decodedService.HopCount {
 		t.Errorf("HopCount mismatch: %d %d", encodedService.HopCount, decodedService.HopCount)
 	}

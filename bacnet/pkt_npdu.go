@@ -1,18 +1,20 @@
 package bacnet
 
+import "fmt"
+
 func NewNPDU(pdu []byte, dest, src *BACNET_ADDRESS, expectReply bool, priority byte) *NPDU {
 	if pdu == nil {
 		pdu = make([]byte, 50)
 	}
 	npdu := &NPDU{
-		PDU: pdu,
-		Dest: dest,
-		Source: src,
-		ExpectingReply: expectReply,
-		Priority: priority,
+		PDU:             pdu,
+		Dest:            dest,
+		Source:          src,
+		ExpectingReply:  expectReply,
+		Priority:        priority,
 		ProtocolVersion: 0x01,
-		NetworkLayer: false,
-		HopCount: HOP_COUNT_DEFAULT,
+		NetworkLayer:    false,
+		HopCount:        HOP_COUNT_DEFAULT,
 	}
 	return npdu
 }
@@ -62,7 +64,7 @@ func (self *NPDU) Encode() *NPDU {
 		self.PDU[encodeIdx] = self.Dest.Len
 		encodeIdx++
 		if self.Dest.Len != 0 {
-			for i = 0; i < self.Dest.Len; i, encodeIdx = i + 1, encodeIdx + 1 {
+			for i = 0; i < self.Dest.Len; i, encodeIdx = i+1, encodeIdx+1 {
 				self.PDU[encodeIdx] = self.Dest.Adr[i]
 			}
 		}
@@ -72,7 +74,7 @@ func (self *NPDU) Encode() *NPDU {
 		self.PDU[encodeIdx] = self.Source.Len
 		encodeIdx++
 		if self.Source.Len != 0 {
-			for i = 0; i < self.Source.Len; i, encodeIdx = i + 1, encodeIdx + 1 {
+			for i = 0; i < self.Source.Len; i, encodeIdx = i+1, encodeIdx+1 {
 				self.PDU[encodeIdx] = self.Source.Adr[i]
 			}
 		}
@@ -112,19 +114,19 @@ func (self *NPDU) Decode() *NPDU {
 	}
 
 	self.ProtocolVersion = self.PDU[0]
-	if self.PDU[1] & BIT7 != 0 {
+	if self.PDU[1]&BIT7 != 0 {
 		self.NetworkLayer = true
 	} else {
 		self.NetworkLayer = false
 	}
-	if self.PDU[1] & BIT2 != 0 {
+	if self.PDU[1]&BIT2 != 0 {
 		self.ExpectingReply = true
 	} else {
 		self.ExpectingReply = false
 	}
 	self.Priority = self.PDU[1] & 0x03
 	len_pdu = 2
-	if self.PDU[1] & BIT5 != 0 {
+	if self.PDU[1]&BIT5 != 0 {
 		len_tmp, dest_net = decode_unsigned16(self.PDU[len_pdu:])
 		len_pdu += len_tmp
 		address_len = self.PDU[len_pdu]
@@ -135,9 +137,9 @@ func (self *NPDU) Decode() *NPDU {
 		}
 		if address_len != 0 {
 			if address_len > MAX_MAC_LEN {
-				panic("Dest address_len greater than MAX_MAC_LEN " + string(MAX_MAC_LEN))
+				panic("Dest address_len greater than MAX_MAC_LEN " + fmt.Sprint(MAX_MAC_LEN))
 			}
-			for i = 0; i < address_len; len_pdu, i = len_pdu + 1, i + 1 {
+			for i = 0; i < address_len; len_pdu, i = len_pdu+1, i+1 {
 				mac_octet = self.PDU[len_pdu]
 				if self.Dest != nil {
 					self.Dest.Adr[i] = mac_octet
@@ -151,7 +153,7 @@ func (self *NPDU) Decode() *NPDU {
 			self.Dest.Adr[i] = 0
 		}
 	}
-	if self.PDU[1] & BIT3 != 0 {
+	if self.PDU[1]&BIT3 != 0 {
 		len_tmp, src_net = decode_unsigned16(self.PDU[len_pdu:])
 		len_pdu += len_tmp
 		address_len = self.PDU[len_pdu]
@@ -162,9 +164,9 @@ func (self *NPDU) Decode() *NPDU {
 		}
 		if address_len != 0 {
 			if address_len > MAX_MAC_LEN {
-				panic("Source address_len greater than MAX_MAC_LEN " + string(MAX_MAC_LEN))
+				panic("Source address_len greater than MAX_MAC_LEN " + fmt.Sprint(MAX_MAC_LEN))
 			}
-			for i = 0; i < address_len; len_pdu, i = len_pdu + 1, i + 1 {
+			for i = 0; i < address_len; len_pdu, i = len_pdu+1, i+1 {
 				mac_octet = self.PDU[len_pdu]
 				if self.Source != nil {
 					self.Source.Adr[i] = mac_octet
